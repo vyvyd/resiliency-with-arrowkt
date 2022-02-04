@@ -1,4 +1,4 @@
-# resiliency-with-arrowkt
+# ⚡ resiliency-with-arrowkt
 
 ## Background 
 
