@@ -21,6 +21,8 @@ class ResiliencyApplicationTests {
 			get("/run")
 		).andExpect(
 			MockMvcResultMatchers.status().isOk
+		).andExpect(
+			MockMvcResultMatchers.content().string("remote + Ok")
 		)
 	}
 
