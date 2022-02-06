@@ -2,6 +2,7 @@ package com.kotlin.resiliency
 
 import arrow.core.Either
 import com.kotlin.resiliency.DTOs.ExternalAPIResponse
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -24,8 +25,12 @@ interface APIClient {
 	fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse>
 }
 
+class ResilientAPIClient(
+	private val apiClient: APIClient
+): APIClient by apiClient {
 
-@Component
+}
+
 class DefaultAPIClient(
 	private val restTemplate: RestTemplate
 ): APIClient {

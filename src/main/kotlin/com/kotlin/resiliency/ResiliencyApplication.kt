@@ -21,5 +21,12 @@ class DefaultConfiguration {
 		return RestTemplate()
 	}
 
+	@Bean
+	fun apiClient(restTemplate: RestTemplate): APIClient {
+		return ResilientAPIClient(
+			DefaultAPIClient(restTemplate)
+		)
+	}
+
 }
 
