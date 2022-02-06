@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.kotlin.resiliency.DTOs.APIError
 import com.kotlin.resiliency.DTOs.APIErrorException
 import com.kotlin.resiliency.DTOs.APISuccess
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType
@@ -49,6 +50,22 @@ class Endpoint(
 						retryable = true
 					)
 				)
+				is UnhandledError -> {
+					when (it.exception) {
+						is CallNotPermittedException -> throw APIErrorException(
+							error = APIError(
+								status = SERVICE_UNAVAILABLE,
+								retryable = true
+							)
+						)
+						else -> throw APIErrorException(
+							error = APIError(
+								status = INTERNAL_SERVER_ERROR,
+								retryable = false
+							)
+						)
+					}
+				}
 			}
 		}
 	}

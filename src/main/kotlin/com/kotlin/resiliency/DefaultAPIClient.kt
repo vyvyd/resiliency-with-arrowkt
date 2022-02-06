@@ -2,28 +2,53 @@ package com.kotlin.resiliency
 
 import arrow.core.Either
 import com.kotlin.resiliency.DTOs.ExternalAPIResponse
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
+import org.springframework.http.client.ClientHttpRequestExecution
+import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestTemplate
-import java.lang.Exception
-import org.springframework.web.context.request.WebRequest
-import org.springframework.http.ResponseEntity
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import org.springframework.web.bind.annotation.ControllerAdvice
-import org.springframework.web.bind.annotation.ExceptionHandler
 
 
 sealed class ExternalAPIError
 data class ServerError(val statusCode: HttpStatus, val exception: Exception) : ExternalAPIError()
 data class ClientError(val statusCode: HttpStatus, val exception: Exception) : ExternalAPIError()
+data class UnhandledError(val exception: Exception): ExternalAPIError()
+
 
 interface APIClient {
 	fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse>
 }
 
+@Component
+class RestTemplateResilience4JDecorator : ClientHttpRequestInterceptor {
+
+	override fun intercept(
+		request: HttpRequest,
+		body: ByteArray,
+		execution: ClientHttpRequestExecution
+	): ClientHttpResponse {
+		return makeCall(execution, request, body)
+	}
+
+	@CircuitBreaker(name="backend")
+	private fun makeCall(
+		execution: ClientHttpRequestExecution,
+		request: HttpRequest,
+		body: ByteArray
+	): ClientHttpResponse {
+		return execution.execute(
+			request,
+			body
+		)
+	}
+
+}
 
 @Component
 class DefaultAPIClient(
@@ -45,6 +70,8 @@ class DefaultAPIClient(
 			Either.Left(ServerError(exception.statusCode, exception))
 		} catch (exception: HttpClientErrorException) {
 			Either.Left(ClientError(exception.statusCode, exception))
+		} catch (exception: Exception) {
+			Either.Left(UnhandledError(exception))
 		}
 	}
 }
