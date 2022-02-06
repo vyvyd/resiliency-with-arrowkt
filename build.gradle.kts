@@ -23,6 +23,12 @@ dependencies {
 	implementation("io.arrow-kt:arrow-core:1.0.1")
 	implementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0")
 	implementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0")
+
+
+	implementation("io.github.resilience4j:resilience4j-spring-boot2:1.7.1")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-aop")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
