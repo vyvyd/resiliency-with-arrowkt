@@ -21,8 +21,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("io.arrow-kt:arrow-core:1.0.1")
+	implementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0")
+	implementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("com.github.tomakehurst:wiremock-jre8:2.32.0")
 }
 
 tasks.withType<KotlinCompile> {

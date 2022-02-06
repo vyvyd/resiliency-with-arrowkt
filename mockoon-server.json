@@ -1,0 +1,72 @@
+{
+  "uuid": "77bb4256-6e3e-48a6-9478-c7bf2522f08e",
+  "lastMigration": 19,
+  "name": "Mockoon server",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3003,
+  "hostname": "0.0.0.0",
+  "routes": [
+    {
+      "uuid": "a65fa9ed-4f61-4a66-a4db-3a89e33a9460",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "customers",
+      "responses": [
+        {
+          "uuid": "0513bd8d-1165-4b02-8b26-e291885bd7ed",
+          "body": "{\n  data: [\n    {\n      \"id\": \"1003214\",\n      \"url\": \"https://customers.acme.ink/og445614adsda\"\n    },\n    {\n      \"id\": \"453453\",\n      \"url\": \"https://customers.acme.ink/fdfsdf3423423fs\"\n    },\n    {\n      \"id\": \"676465\",\n      \"url\": \"https://customers.acme.ink/gtryrty322424d\"\n    },\n    {\n      \"id\": \"456432\",\n      \"url\": \"https://customers.acme.ink/jytbda34344sgrt\"\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false
+        }
+      ],
+      "enabled": true,
+      "randomResponse": false,
+      "sequentialResponse": false
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ]
+}
