@@ -1,9 +1,11 @@
 package com.kotlin.resiliency
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.kotlin.resiliency.StubbedResponses.aListOfPredefinedCustomers
+import org.hamcrest.core.Is.`is`
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -42,11 +44,43 @@ class ResiliencyApplicationTests {
 			MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)
 		)
 
-		wireMockServer.stop()
 	}
 
+	@Test
+	fun handlesAPIServerError() {
+		wireMockServer.stubFor(
+			get(urlEqualTo("/customers"))
+				.willReturn(aResponse().withStatus(500).withBody("<h1>Internal Server Error</h1>"))
+		)
 
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/run")
+		).andExpect(
+			MockMvcResultMatchers.status().isBadGateway
+		).andExpect(
+			MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$.retryable", `is`(true))
+		)
+	}
 
+	@Test
+	fun handlesAPIClientError() {
+		wireMockServer.stubFor(
+			get(urlEqualTo("/customers"))
+				.willReturn(aResponse().withStatus(400).withBody("<h1>Bad Request</h1>"))
+		)
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/run")
+		).andExpect(
+			MockMvcResultMatchers.status().isBadGateway
+		).andExpect(
+			MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$.retryable", `is`(false))
+		)
+	}
 
 }
 
