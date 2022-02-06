@@ -20,12 +20,17 @@ sealed class ExternalAPIError
 data class ServerError(val statusCode: HttpStatus, val exception: Exception) : ExternalAPIError()
 data class ClientError(val statusCode: HttpStatus, val exception: Exception) : ExternalAPIError()
 
-@Component
-class APIClient(
-	private val restTemplate: RestTemplate
-) {
+interface APIClient {
+	fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse>
+}
 
-	fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse> {
+
+@Component
+class DefaultAPIClient(
+	private val restTemplate: RestTemplate
+): APIClient {
+
+	override fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse> {
 
 		return try {
 			val response = restTemplate.exchange(

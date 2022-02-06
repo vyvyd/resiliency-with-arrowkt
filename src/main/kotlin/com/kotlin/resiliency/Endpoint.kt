@@ -2,12 +2,10 @@ package com.kotlin.resiliency
 
 import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kotlin.resiliency.DTOs.APIError
 import com.kotlin.resiliency.DTOs.APIErrorException
 import com.kotlin.resiliency.DTOs.APISuccess
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -16,13 +14,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.context.request.WebRequest
-import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @Controller
 class Endpoint(
-	private val apiClient: APIClient,
-	private val objectMapper: ObjectMapper
+	private val apiClient: APIClient
 ) {
 	@GetMapping(
 		"/run",
