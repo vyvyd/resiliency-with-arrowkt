@@ -50,22 +50,18 @@ class Endpoint(
 						retryable = true
 					)
 				)
-				is UnhandledError -> {
-					when (it.exception) {
-						is CallNotPermittedException -> throw APIErrorException(
-							error = APIError(
-								status = SERVICE_UNAVAILABLE,
-								retryable = true
-							)
-						)
-						else -> throw APIErrorException(
-							error = APIError(
-								status = INTERNAL_SERVER_ERROR,
-								retryable = false
-							)
-						)
-					}
-				}
+				is UnhandledError ->  throw APIErrorException(
+					error = APIError(
+						status = INTERNAL_SERVER_ERROR,
+						retryable = false
+					)
+				)
+				is BackendIsQuarantined -> throw APIErrorException(
+					error = APIError(
+						status = SERVICE_UNAVAILABLE,
+						retryable = true
+					)
+				)
 			}
 		}
 	}

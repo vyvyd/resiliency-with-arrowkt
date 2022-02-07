@@ -25,8 +25,8 @@ class ResiliencyApplicationTestsConfiguration {
 	@Primary
 	fun restOperations(wireMockServer: WireMockServer) : RestOperations {
 		val factory = DefaultUriBuilderFactory(wireMockServer.baseUrl())
-		return Resilience4JAwareRestOperations(RestTemplate().also {
+		return RestTemplate().also {
 			it.uriTemplateHandler = factory
-		})
+		}
 	}
 }
