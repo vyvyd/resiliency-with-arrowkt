@@ -2,17 +2,12 @@ package com.kotlin.resiliency
 
 import arrow.core.Either
 import com.kotlin.resiliency.DTOs.ExternalAPIResponse
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
-import org.springframework.http.client.ClientHttpRequestExecution
-import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.RestOperations
 
 
 sealed class ExternalAPIError
@@ -25,34 +20,10 @@ interface APIClient {
 	fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse>
 }
 
-@Component
-class RestTemplateResilience4JDecorator : ClientHttpRequestInterceptor {
-
-	override fun intercept(
-		request: HttpRequest,
-		body: ByteArray,
-		execution: ClientHttpRequestExecution
-	): ClientHttpResponse {
-		return makeCall(execution, request, body)
-	}
-
-	@CircuitBreaker(name="backend")
-	private fun makeCall(
-		execution: ClientHttpRequestExecution,
-		request: HttpRequest,
-		body: ByteArray
-	): ClientHttpResponse {
-		return execution.execute(
-			request,
-			body
-		)
-	}
-
-}
 
 @Component
 class DefaultAPIClient(
-	private val restTemplate: RestTemplate
+	private val restTemplate: RestOperations
 ): APIClient {
 
 	override fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse> {

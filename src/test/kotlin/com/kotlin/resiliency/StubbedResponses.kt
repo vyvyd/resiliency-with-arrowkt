@@ -2,11 +2,13 @@ package com.kotlin.resiliency
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 
 object StubbedResponses {
 
 	fun aListOfPredefinedCustomers(): ResponseDefinitionBuilder = WireMock.aResponse()
+		.withStatus(200)
 		.withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 		.withBody("""
 					{
