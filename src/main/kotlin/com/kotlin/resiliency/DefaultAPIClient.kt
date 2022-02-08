@@ -20,7 +20,6 @@ interface APIClient {
 	fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse>
 }
 
-
 @Component
 class DefaultAPIClient(
 	private val restTemplate: RestOperations
