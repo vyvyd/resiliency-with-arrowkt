@@ -60,13 +60,13 @@ For every solution, we must consider that Resilience4J primarily works with Exce
 
 ### Rejected Approaches 
 
-**1. Using a RestTemplateInterceptor **
+**1. Using a RestTemplateInterceptor**
 
 The advantage of using a RestTemplateInterceptor is that we can introduce resiliency to _all_ API calls made through a RestTemplate. This seems very powerful indeed. 
 
 However, we will have throw an exception when the CircuitBreaker becomes open, and hence this approach was rejected since we were looking to avoid Exceptions in our logic flows.
 
-**2. Decorating a `RestOperations` interface **
+**2. Decorating a `RestOperations` interface**
 
 We could also decorate an RestOperations interface which can be passed to every APIClient, and hence we can still get the advantage of an application-wide change. 
 
