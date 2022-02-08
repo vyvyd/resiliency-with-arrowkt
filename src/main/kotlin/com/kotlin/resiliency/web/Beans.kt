@@ -1,28 +1,12 @@
-package com.kotlin.resiliency
+package com.kotlin.resiliency.web
 
+import com.kotlin.resiliency.external.Beans.Customer
 import org.springframework.http.HttpStatus
-import java.lang.Exception
 import java.lang.RuntimeException
 
-object DTOs {
+object Beans {
 
-    /**
-     * External API DTO objects
-     *
-     * For now it is based on the dummy responses
-     * available in the wiremock stubbings
-     */
-	data class Customer(
-        val id: String,
-        val url: String
-    )
-
-    data class ExternalAPIResponse(
-        val data: List<Customer>
-    )
-
-
-    /**
+	/**
      * REST Controller DTOs
      *
      * These are used by our application
@@ -37,11 +21,10 @@ object DTOs {
     data class APIError(
         val status: HttpStatus,
         val retryable: Boolean = false
-    ): APIResponse()
+    ) : APIResponse()
 
     class APIErrorException(
         val error: APIError
     ) : RuntimeException()
-
 
 }

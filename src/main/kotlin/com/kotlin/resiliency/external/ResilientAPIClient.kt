@@ -1,6 +1,10 @@
 package com.kotlin.resiliency
 
 import arrow.core.Either
+import com.kotlin.resiliency.external.Beans.ExternalAPIResponse
+import com.kotlin.resiliency.external.Client
+import com.kotlin.resiliency.external.ExternalAPIError
+import com.kotlin.resiliency.external.ExternalAPIError.BackendIsQuarantined
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
@@ -33,12 +37,12 @@ object CircuitBreakerFactory {
 @Component
 @Primary
 class ResilientAPIClient(
-	private val apiClient: APIClient
-): APIClient {
+	private val apiClient: Client
+): Client {
 
 	private val circuitBreaker = CircuitBreakerFactory.newCircuitBreaker()
 
-	override fun getCustomers(): Either<ExternalAPIError, DTOs.ExternalAPIResponse> {
+	override fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse> {
 		return try {
 			circuitBreaker.executeSupplier {
 				val result = apiClient.getCustomers()

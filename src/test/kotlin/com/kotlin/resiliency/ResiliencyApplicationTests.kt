@@ -58,7 +58,7 @@ class ResiliencyApplicationTests {
 		).andExpect(
 			status().isBadGateway
 		).andExpect(
-			MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)
+			MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE)
 		).andExpect(
 			MockMvcResultMatchers.jsonPath("$.retryable", `is`(true))
 		)
@@ -76,7 +76,7 @@ class ResiliencyApplicationTests {
 		).andExpect(
 			status().isBadGateway
 		).andExpect(
-			MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)
+			MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE)
 		).andExpect(
 			MockMvcResultMatchers.jsonPath("$.retryable", `is`(false))
 		)

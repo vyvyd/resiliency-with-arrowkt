@@ -1,29 +1,20 @@
 package com.kotlin.resiliency
 
 import arrow.core.Either
-import com.kotlin.resiliency.DTOs.ExternalAPIResponse
+import com.kotlin.resiliency.external.ExternalAPIError.*
+import com.kotlin.resiliency.external.Beans.ExternalAPIResponse
+import com.kotlin.resiliency.external.Client
+import com.kotlin.resiliency.external.ExternalAPIError
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestOperations
 
-
-sealed class ExternalAPIError
-data class ServerError(val statusCode: HttpStatus, val exception: Exception) : ExternalAPIError()
-data class ClientError(val statusCode: HttpStatus, val exception: Exception) : ExternalAPIError()
-data class UnhandledError(val exception: Exception): ExternalAPIError()
-data class BackendIsQuarantined(val reason: String): ExternalAPIError()
-
-interface APIClient {
-	fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse>
-}
-
 @Component
 class DefaultAPIClient(
 	private val restTemplate: RestOperations
-): APIClient {
+): Client {
 
 	override fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse> {
 
