@@ -33,29 +33,30 @@ object CircuitBreakerFactory {
 	}
 }
 
-
 @Component
 @Primary
 class ResilientAPIClient(
-	private val apiClient: Client
+	private val apiClient: Client,
+	private val circuitBreaker: CircuitBreaker = CircuitBreakerFactory.newCircuitBreaker()
 ): Client {
 
-	private val circuitBreaker = CircuitBreakerFactory.newCircuitBreaker()
-
 	override fun getCustomers(): Either<ExternalAPIError, ExternalAPIResponse> {
-		return try {
-			circuitBreaker.executeSupplier {
-				val result = apiClient.getCustomers()
-				result.mapLeft {
-					throw EitherIsLeftException(it)
-				}
-			}
-		} catch (ex: CallNotPermittedException)  {
-			return Either.Left(BackendIsQuarantined("OPEN Circuit: backend"))
-		} catch (ex: EitherIsLeftException) {
-			return Either.Left(ex.leftValue)
-		}
+		return circuitBreaker.executeEitherKT { apiClient.getCustomers() }
 	}
 
 }
 
+fun <R> CircuitBreaker.executeEitherKT ( block: () -> Either<ExternalAPIError,R>) : Either<ExternalAPIError,R> {
+	return try {
+		this.executeSupplier {
+			val result = block()
+			result.mapLeft {
+				throw EitherIsLeftException(it)
+			}
+		}
+	} catch (ex: CallNotPermittedException)  {
+		return Either.Left(BackendIsQuarantined("OPEN Circuit: backend"))
+	} catch (ex: EitherIsLeftException) {
+		return Either.Left(ex.leftValue)
+	}
+}
