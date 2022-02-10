@@ -2,6 +2,7 @@ package com.kotlin.resiliency
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import com.kotlin.resiliency.StubbedResponses.aListOfPredefinedCustomers
 import org.hamcrest.core.Is.`is`
@@ -85,6 +86,28 @@ class ResiliencyApplicationTests {
 	}
 
 	@Test
+	fun aFlakyAPICanBeHandledByTheClient() {
+		wireMockServer.stubFor(
+				get(urlEqualTo("/customers"))
+						.inScenario("Fail after first successful call")
+						.whenScenarioStateIs(STARTED)
+						.willReturn(aListOfPredefinedCustomers())
+						.willSetStateTo("FAILURE")
+		)
+
+		wireMockServer.stubFor(
+				get(urlEqualTo("/customers"))
+						.inScenario("Fail after first successful call")
+						.whenScenarioStateIs("FAILURE")
+						.willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
+						.willSetStateTo(STARTED) // next call should succeed
+		)
+
+		nextApiCallHasResult(get("/run"), status().isOk)
+		nextApiCallHasResult(get("/run"), status().isOk)
+	}
+
+	@Test
 	fun opensACircuitBreaker() {
 		wireMockServer.stubFor(
 			get(urlEqualTo("/customers"))
@@ -117,7 +140,6 @@ class ResiliencyApplicationTests {
 		// Reset mock scenario so that a 200 OK is returned again
 		wireMockServer.resetScenarios()
 		nextApiCallHasResult(get("/run"), status().isOk)
-
 	}
 
 	private fun nextApiCallHasResult(mockHttpServletRequestBuilder: MockHttpServletRequestBuilder, resultMatcher: ResultMatcher) {

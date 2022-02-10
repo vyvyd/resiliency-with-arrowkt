@@ -6,7 +6,7 @@ import com.kotlin.resiliency.external.ExternalAPIError
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 
-object CircuitBreakerExtensions {
+object Resilience4JExtensions {
 	fun <R> CircuitBreaker.executeEitherKT (block: () -> Either<ExternalAPIError, R>) : Either<ExternalAPIError, R> {
 		return try {
 			this.executeSupplier {
