@@ -89,6 +89,8 @@ The implementation isolates the core Reslience4J code to the above two extension
 
 This thrown exception triggers the Resilience4J logic to kick in. Any known exceptions thrown by the library are again converted back into an `Either`.
 
+This seems to be easiest way to do this.
+
 **However, there are other ways to do this** 
 
 ### Alternate approaches
