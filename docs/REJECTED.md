@@ -1,8 +1,13 @@
 # Rejected Approaches
 
-## Integration Strategy: Resilience4J + RestTemplate
+To integration **Reslience4J** to the backend.
+
+## Integration Strategies
+
+### Resilience4J + RestTemplate
 
 **Using a RestTemplateInterceptor**
+
 | | Advantage  | Disadvantage |
 |-|------------- | ------------- |
 |1.| All calls in the application automatically have resiliency built in | Client-By-Client configuration is not possible (which is usually what you need) |
