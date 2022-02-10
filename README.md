@@ -45,12 +45,12 @@ An errors arising during making a call to the External System are to be converte
 
 We will implement two resiliency patterns: 
 
-### Circuit-Breaker
+### 1. Circuit-Breaker
 If there is a progressive degradation of the External System, calls to the system will be blocked. 
 
 If the Circuit-Breaker trips (due to say, the External System, being down) - the API Endpoint in our backend system would respond with a `503 Service Unavailable` 
 
-### Retry
+### 2. Retry
 If there is an occassional failure during communication with the External System, the failed call will be retried automatically.
 
 ## Testing
@@ -83,13 +83,11 @@ Do consider that most of the Reslience4J logic is hidden behind the two custom e
 
 ## Details 
 
-The two extension functions can be seen [here](https://github.com/vyvyd/resiliency-with-arrowkt/blob/main/src/main/kotlin/com/kotlin/resiliency/external/resilience4j/Resilience4JExtensions.kt).
+### Using Reslience4J with ArrowKT
 
-The implementation isolates the core Reslience4J code to the above two extension methods. The code evaluates the `Either` object that is returned by the `supplier`, and throws an `Exception` incase the result is an `Either.Left`. 
+This is done through the two extension functions [here](https://github.com/vyvyd/resiliency-with-arrowkt/blob/main/src/main/kotlin/com/kotlin/resiliency/external/resilience4j/Resilience4JExtensions.kt).
 
-This thrown exception triggers the Resilience4J logic to kick in. Any known exceptions thrown by the library are again converted back into an `Either`.
-
-This seems to be easiest way to do this.
+The methods evaluate a provided supplier returning an `Either` object. If the `Either` resolves to an `Either.Left`, an exception is thrown which kicks in the Resilience4J behavior. 
 
 **However, there are other ways to do this** 
 
@@ -97,12 +95,15 @@ This seems to be easiest way to do this.
 
 **Copy implemenration of other `executeSupplier` methods**  
 
-We could copy over logic from the existing `executeSupplier` [implementation](https://github.com/resilience4j/resilience4j/blob/master/resilience4j-circuitbreaker/src/main/java/io/github/resilience4j/circuitbreaker/CircuitBreaker.java#L189) in the library, but this time for an ArrowKT `Either` object. 
+We could copy over logic from the existing `executeSupplier` [implementation](https://github.com/resilience4j/resilience4j/blob/master/resilience4j-circuitbreaker/src/main/java/io/github/resilience4j/circuitbreaker/CircuitBreaker.java#L189) in the library, but adapt it for an ArrowKT `Either` object. 
 
-We avoided because then the code will have to be in lock-step with internal implementation of the library. This is best avoided. 
+I also see that this was the implementation taken by this [library](https://mvnrepository.com/artifact/com.duytsev/resilience4j-arrowkt)
 
+**Disadvantage**  
+I did not prefer this approach because this code we write will have to evolve lock-step with the implementation of the `executeSupplier` method linked above. This can be risky with a future update of the Resilience4J library version. 
 
-## References
+ 
+## Extra Reading
 
 https://www.dynatrace.com/news/blog/the-cost-of-an-exception/
 
