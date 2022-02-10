@@ -1,6 +1,5 @@
 package com.kotlin.resiliency.web
 
-import com.kotlin.resiliency.external.Beans.Customer
 import org.springframework.http.HttpStatus
 import java.lang.RuntimeException
 
@@ -13,9 +12,9 @@ object Beans {
      */
     sealed class APIResponse;
 
-    data class APISuccess(
+    data class APISuccess<T>(
         val status: HttpStatus,
-        val customers: List<Customer>
+        val data: T
     ) : APIResponse()
 
     data class APIError(
