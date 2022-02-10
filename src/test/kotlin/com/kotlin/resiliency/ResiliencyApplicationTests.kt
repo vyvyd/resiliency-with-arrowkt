@@ -13,7 +13,9 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultMatcher
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -37,7 +39,7 @@ class ResiliencyApplicationTests {
 		)
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/run")
+			get("/run")
 		).andExpect(
 			status().isOk
 		).andExpect(
@@ -54,7 +56,7 @@ class ResiliencyApplicationTests {
 		)
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/run")
+			get("/run")
 		).andExpect(
 			status().isBadGateway
 		).andExpect(
@@ -72,7 +74,7 @@ class ResiliencyApplicationTests {
 		)
 
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/run")
+			get("/run")
 		).andExpect(
 			status().isBadGateway
 		).andExpect(
@@ -99,28 +101,28 @@ class ResiliencyApplicationTests {
 				.willReturn(aResponse().withStatus(500).withBody("<h1>Internal Server Error</h1>"))
 		)
 
-		nextAPICallHasResponseMatching(status().isOk)
-		nextAPICallHasResponseMatching(status().isBadGateway)
-		nextAPICallHasResponseMatching(status().isBadGateway)
-		nextAPICallHasResponseMatching(status().isBadGateway)
-		nextAPICallHasResponseMatching(status().isBadGateway)
-		nextAPICallHasResponseMatching(status().isBadGateway)
-		nextAPICallHasResponseMatching(status().isServiceUnavailable) // 6th call, 50% of the last 6 calls have failed
-		nextAPICallHasResponseMatching(status().isServiceUnavailable)
-		nextAPICallHasResponseMatching(status().isServiceUnavailable)
+		nextApiCallHasResult(get("/run"), status().isOk)
+		nextApiCallHasResult(get("/run"), status().isBadGateway)
+		nextApiCallHasResult(get("/run"), status().isBadGateway)
+		nextApiCallHasResult(get("/run"), status().isBadGateway)
+		nextApiCallHasResult(get("/run"), status().isBadGateway)
+		nextApiCallHasResult(get("/run"), status().isBadGateway)
+		nextApiCallHasResult(get("/run"), status().isServiceUnavailable) // 6th call, 50% of the last 6 calls have failed
+		nextApiCallHasResult(get("/run"), status().isServiceUnavailable)
+		nextApiCallHasResult(get("/run"), status().isServiceUnavailable)
 
 		// Wait for the CircuitBreaker to go to HALF-OPEN
 		Thread.sleep(1000)
 
 		// Reset mock scenario so that a 200 OK is returned again
 		wireMockServer.resetScenarios()
-		nextAPICallHasResponseMatching(status().isOk)
+		nextApiCallHasResult(get("/run"), status().isOk)
 
 	}
 
-	private fun nextAPICallHasResponseMatching(resultMatcher: ResultMatcher) {
+	private fun nextApiCallHasResult(mockHttpServletRequestBuilder: MockHttpServletRequestBuilder, resultMatcher: ResultMatcher) {
 		mockMvc.perform(
-			MockMvcRequestBuilders.get("/run")
+				mockHttpServletRequestBuilder
 		).andExpect(
 			resultMatcher
 		)
