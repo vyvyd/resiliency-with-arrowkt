@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import com.kotlin.resiliency.StubbedResponses.aListOfPredefinedCustomers
 import org.hamcrest.core.Is.`is`
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -31,9 +32,15 @@ class ResiliencyApplicationTests {
 	@Autowired
 	private lateinit var wireMockServer: WireMockServer
 
+	@AfterEach
+	fun afterEach() {
+		wireMockServer.resetMappings()
+		wireMockServer.resetScenarios()
+		wireMockServer.resetAll()
+	}
+
 	@Test
 	fun getsOk() {
-
 		wireMockServer.stubFor(
 			get(urlEqualTo("/customers"))
 				.willReturn(aListOfPredefinedCustomers())
@@ -89,22 +96,24 @@ class ResiliencyApplicationTests {
 	fun aFlakyAPICanBeHandledByTheClient() {
 		wireMockServer.stubFor(
 				get(urlEqualTo("/customers"))
-						.inScenario("Fail after first successful call")
+						.inScenario("Fail after first successful call 1")
 						.whenScenarioStateIs(STARTED)
 						.willReturn(aListOfPredefinedCustomers())
-						.willSetStateTo("FAILURE")
+						.willSetStateTo("TOGGLE FAILURE")
 		)
 
 		wireMockServer.stubFor(
 				get(urlEqualTo("/customers"))
-						.inScenario("Fail after first successful call")
-						.whenScenarioStateIs("FAILURE")
+						.inScenario("Fail after first successful call 1")
+						.whenScenarioStateIs("TOGGLE FAILURE")
 						.willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
 						.willSetStateTo(STARTED) // next call should succeed
 		)
 
 		nextApiCallHasResult(get("/run"), status().isOk)
 		nextApiCallHasResult(get("/run"), status().isOk)
+		wireMockServer.resetScenarios()
+
 	}
 
 	@Test
@@ -125,8 +134,6 @@ class ResiliencyApplicationTests {
 		)
 
 		nextApiCallHasResult(get("/run"), status().isOk)
-		nextApiCallHasResult(get("/run"), status().isBadGateway)
-		nextApiCallHasResult(get("/run"), status().isBadGateway)
 		nextApiCallHasResult(get("/run"), status().isBadGateway)
 		nextApiCallHasResult(get("/run"), status().isBadGateway)
 		nextApiCallHasResult(get("/run"), status().isBadGateway)
