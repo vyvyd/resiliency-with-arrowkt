@@ -2,7 +2,10 @@
 
 ## Background 
 
-Consider that you choose the following tools in your backend service 
+Consider you backend service makes calls to external service(s) and you would like to introduce [resliency](https://hackernoon.com/lets-talk-about-resilience-97051e14761f) to your API. 
+
+The tools that you have in your toolkit are: 
+
 - 🛠 **Kotlin** language to target the JVM 
 - 🛠 **SpringBoot** as the web-framework
 - 🛠 **RestTemplate** to make external API calls
@@ -25,6 +28,8 @@ node "External System" #DDDDDD {
 }
 @enduml
 ```
+
+We will implement the [Circuit-Breaker](https://martinfowler.com/bliki/CircuitBreaker.html) pattern in this Target picture
 
 ## Error Handling Strategy 
 
@@ -61,8 +66,12 @@ For every solution, we must consider that Resilience4J primarily works with Exce
 ### Rejected Approaches 
 
 **1. Using a RestTemplateInterceptor**
+| | Advantage  | Disadvantage |
+|-|------------- | ------------- |
+|1.| All calls in the application automatically have resiliency built in | Client-By-Client configuration is not possible (which is usually what you need) |
+|2.| | `Interceptors` will need to throw Exceptions to indicate failure (for example, when a CircuitBreaker is open). This would mean that this exception needs to be handled in different places in the code, and might make comprehension harder|
 
-The advantage of using a RestTemplateInterceptor is that we can introduce resiliency to _all_ API calls made through a RestTemplate. This seems very powerful indeed. 
+
 
 However, we will have throw an exception when the CircuitBreaker becomes open, and hence this approach was rejected since we were looking to avoid Exceptions in our logic flows.
 
