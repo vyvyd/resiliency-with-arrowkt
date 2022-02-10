@@ -61,7 +61,7 @@ If there is an occassional failure during communication with the External System
 
 # Resiliency Solution 
 
-A Resilience4J based implementation of API Client: 
+A Resilience4J based implementation of API Client (modelled as a [Decorator](https://refactoring.guru/design-patterns/decorator)): 
 
 ```kotlin
 class ResilientAPIClient(
@@ -100,6 +100,8 @@ We could copy over logic from the existing `executeSupplier` [implementation](ht
 We avoided because then the code will have to be in lock-step with internal implementation of the library. This is best avoided. 
 
 
+## References
 
+https://www.dynatrace.com/news/blog/the-cost-of-an-exception/
 
 
