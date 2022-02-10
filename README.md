@@ -103,7 +103,9 @@ I did not prefer this approach because this code we write will have to evolve lo
 
 ### 2. Prefer using Decorators 
 
-The Reslience4J logic is also encapsulated in an specific `APIClient` instance. This enable selective injection of this interface during application-load based on a feature-toggle. 
+The Resiliency behavior is also encapsulated in an specific `APIClient` instance. This enable selective injection of this interface during application-load based on a feature-toggle. 
+
+Also, if we were to change the resiliency library in the future, we only have to write another implementation. 
 
 With Kotlin's [Delegation](https://kotlinlang.org/docs/delegation.html#overriding-a-member-of-an-interface-implemented-by-delegation) feature, it becomes easily to selectively introduce Resiliency to 'some' API calls where as we can ignore others, 
  
