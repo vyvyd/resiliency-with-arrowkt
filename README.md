@@ -76,10 +76,12 @@ For every solution, we must consider that Resilience4J primarily works with Exce
 However, we will have throw an exception when the CircuitBreaker becomes open, and hence this approach was rejected since we were looking to avoid Exceptions in our logic flows.
 
 **2. Decorating a `RestOperations` interface**
+| | Advantage  | Disadvantage |
+|-|------------- | ------------- |
+|1.| An app wide change, just like the last approach - Spring DI can be used to inject this decorated RestOperations to every API Client that needs a RestTemplate| The `RestOperations` interface is pretty big.However there are a lot of methods in the single RestOperations interface, and it would mean a lot of maintainence of boilerplate. |
 
-We could also decorate an RestOperations interface which can be passed to every APIClient, and hence we can still get the advantage of an application-wide change. 
 
-However there are a lot of methods in the single RestOperations interface, and it would mean a lot of maintainence of boilerplate.
+
 
 
 
