@@ -81,27 +81,31 @@ class ResilientAPIClient(
 
 Do consider that most of the Reslience4J logic is hidden behind the two custom extension methods `circuitBreaker.executeEitherKT` and `retry.executeEitherKT`.
 
-## Details 
+## Implementation Details 
 
-### Using Reslience4J with ArrowKT
+### 1. Using Reslience4J with ArrowKT
 
 This is done through the two extension functions [here](https://github.com/vyvyd/resiliency-with-arrowkt/blob/main/src/main/kotlin/com/kotlin/resiliency/external/resilience4j/Resilience4JExtensions.kt).
 
 The methods evaluate a provided supplier returning an `Either` object. If the `Either` resolves to an `Either.Left`, an exception is thrown which kicks in the Resilience4J behavior. 
 
-**However, there are other ways to do this** 
+---
 
-### Alternate approaches
+#### Alternate approach: Copy `executeSupplier` implementation  
+This is the  existing `executeSupplier` [implementation](https://github.com/resilience4j/resilience4j/blob/master/resilience4j-circuitbreaker/src/main/java/io/github/resilience4j/circuitbreaker/CircuitBreaker.java#L189) method. 
 
-**Copy implemenration of other `executeSupplier` methods**  
-
-We could copy over logic from the existing `executeSupplier` [implementation](https://github.com/resilience4j/resilience4j/blob/master/resilience4j-circuitbreaker/src/main/java/io/github/resilience4j/circuitbreaker/CircuitBreaker.java#L189) in the library, but adapt it for an ArrowKT `Either` object. 
-
-I also see that this was the implementation taken by this [library](https://mvnrepository.com/artifact/com.duytsev/resilience4j-arrowkt)
+We can duplicate this method, and write an implementation that is specifically to be used for ArrowKT `Either` objects. This [library](https://mvnrepository.com/artifact/com.duytsev/resilience4j-arrowkt) seems to be following the same approach.
 
 **Disadvantage**  
-I did not prefer this approach because this code we write will have to evolve lock-step with the implementation of the `executeSupplier` method linked above. This can be risky with a future update of the Resilience4J library version. 
+I did not prefer this approach because this code we write will have to evolve lock-step with the implementation of the actual `executeSupplier` method. This can be risky with a future update of the Resilience4J library version which might change the definition of the `executeSupplier` method.
 
+---
+
+### 2. Prefer using Decorators 
+
+The Reslience4J logic is also encapsulated in an specific `APIClient` instance. This enable selective injection of this interface during application-load based on a feature-toggle. 
+
+With Kotlin's [Delegation](https://kotlinlang.org/docs/delegation.html#overriding-a-member-of-an-interface-implemented-by-delegation) feature, it becomes easily to selectively introduce Resiliency to 'some' API calls where as we can ignore others, 
  
 ## Extra Reading
 
